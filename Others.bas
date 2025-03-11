@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module5"
+Attribute VB_Name = "Others"
 Sub New_Primers()
     ' Declare a variable to hold the active sheet
     Dim ws As Worksheet
@@ -18,16 +18,12 @@ Sub Reset()
     
     ' Clear the contents of the specified cells on the active sheet
     With ActiveSheet
-        .Range("A2").ClearContents
-        .Range("B2").ClearContents
-        .Range("C2").ClearContents
-        .Range("D2").ClearContents
-        .Range("E2").ClearContents
-        .Range("H2").ClearContents
+        .Range("A2:E2").ClearContents
+        .Range("H2:I2").ClearContents
     End With
     
     ' Set the range of the table
-    Set tableRange = ActiveSheet.Range("A9:I18") ' Replace with your table range
+    Set tableRange = ActiveSheet.Range("A9:M18") ' Replace with your table range
 
     ' Clear the contents of the table
     tableRange.ClearContents

@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module3"
+Attribute VB_Name = "UCSC_PCR"
 Sub UCSC_PCR()
     On Error GoTo ErrorHandler
     
@@ -9,6 +9,9 @@ Sub UCSC_PCR()
     Dim href As String
     Dim linkText As String
     Dim row As Integer
+    Dim genome As String
+    
+    genome = ActiveSheet.Range("G2").Value
     
     ' Loop through the rows in the Excel sheet
     row = 9 ' Start from the nineth row
@@ -37,6 +40,7 @@ Sub UCSC_PCR()
         
         ' Fill in the text fields and trigger change events
         With ie.document
+            .getElementById("db").Value = genome
             .getElementById("wp_f").Value = Fw
             .getElementById("wp_f").FireEvent "onchange"
             .getElementById("wp_r").Value = Re
@@ -62,12 +66,19 @@ Sub UCSC_PCR()
         Set link = ie.document.querySelector("a[href*='chr']") ' Adjust the selector as needed
     
         ' Get the href attribute and inner text
-        href = link.href
         linkText = link.innerText
+        href = link.href
     
         ' Write the information to the Excel sheet
-        ActiveSheet.Cells(row, 8).Value = href
-        ActiveSheet.Cells(row, 7).Value = linkText
+        If genome = "hg19" Then
+            ActiveSheet.Cells(row, 7).Value = linkText
+            ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Cells(row, 8), Address:=href, TextToDisplay:="UCSC"
+        ElseIf genome = "hg38" Then
+            ActiveSheet.Cells(row, 9).Value = linkText
+            ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Cells(row, 10), Address:=href, TextToDisplay:="UCSC"
+        Else
+            ' Optionally handle other cases or do nothing
+        End If
     
         ' Clean up
         ie.Quit

@@ -1,3 +1,38 @@
+# CHANGELOG
+
+## [1.3.0] - 03/03/2025
+
+### Added
+
+- hg19/hg38 coordinates.
+- Number of off-target products.
+- Two All_In scripts to run everything at once.
+- Automatic check of the sequence with the most homology in Primer Blast.
+
+### Changed
+
+- Modified the getDNA_gene script to also report the chromosome, start, and end.
+- Modified both getDNA scripts to include a UCSC link to the design area.
+
+### Fixed
+
+- Correct use of the genome in various VBA scripts, with the ability to change it via a dropdown menu.
+- Corrected URLs to display text instead of the address to reduce clutter.
+- Fixed the Reset script to correctly clear all data from the table.
+
+### Removed
+
+- Cleaned up the SNP_check script and centered the image correctly in the cell.
+
+### Issues
+
+- Random Permission Denied Error 70 when PrimerBlast processes the list of primers; closing IE and restarting the script often resolves the error.
+- Object unavailable when the script tries to check seq1 to select the correct sequence; probably due to a "submitting" page appearing before the "running" page.
+
+### To Do
+
+- Use the Ok checkbox in conjunction with the "Order" button that is created ; Partially functional, you can test it.
+
 ## [1.2.0] - 05/01/2025
 
 ### Added
@@ -10,6 +45,8 @@
 ### Fixed
 
 ### Removed
+
+### Issues
 
 ### To Do
 
@@ -28,6 +65,8 @@
 
 ### Removed
 
+### Issues
+
 ### To Do
 
 ## [1.0.0] - 15/12/2024
@@ -40,7 +79,13 @@
 
 ### Removed
 
+### Issues
+
 ### To Do
 
+# VERSIONS
+
+[1.3.0]: https://github.com/Hugbenny/Primer_Design/releases/tag/v1.3.0
+[1.2.0]: https://github.com/Hugbenny/Primer_Design/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Hugbenny/Primer_Design/releases/tag/v1.1.0
 [1.0.0]: https://github.com/Hugbenny/Primer_Design/releases/tag/v1.0.0

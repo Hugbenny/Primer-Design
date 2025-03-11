@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module1"
+Attribute VB_Name = "Primer_Blast"
 Sub Primer_Blast()
     On Error GoTo ErrorHandler
     Dim ie As Object
@@ -138,6 +138,60 @@ Sub Primer_Blast()
         DoEvents
     Loop
 
+    ' Wait for the page to fully load
+    Do While ie.Busy Or ie.readyState <> 4
+        DoEvents
+    Loop
+    
+    ' Wait for the new tab to fully load
+    Do While ie.Busy Or ie.readyState <> 4
+        DoEvents
+    Loop
+
+    ' Wait for the page to fully load
+    Do While ie.Busy Or ie.readyState <> 4
+        DoEvents
+    Loop
+
+    ' Wait for the checkbox with id "seq_1" to appear
+    Do While ie.document.getElementById("seq_1") Is Nothing
+        DoEvents
+    Loop
+    
+    ' Check the checkbox with id "seq_1"
+    ie.document.getElementById("seq_1").Checked = True
+    
+    ' Find the button with value "Submit" and click it
+    Dim submitButton As Object
+    Set submitButton = Nothing
+    
+    Do While submitButton Is Nothing
+        Set submitButton = ie.document.querySelector("input[value='Submit']")
+        DoEvents
+    Loop
+    
+    submitButton.Click
+
+    ' Wait for the new tab to fully load
+    Do While ie.Busy Or ie.readyState <> 4
+        DoEvents
+    Loop
+        
+    ' Wait for the new tab to fully load
+    Do While ie.Busy Or ie.readyState <> 4
+        DoEvents
+    Loop
+        
+    ' Wait for the new tab to fully load
+    Do While ie.Busy Or ie.readyState <> 4
+        DoEvents
+    Loop
+
+    ' Wait for the page to fully load
+    Do While ie.Busy Or ie.readyState <> 4
+        DoEvents
+    Loop
+        
     Dim pairs_number As Integer
     Dim pairs_number_str As String
     
@@ -145,7 +199,7 @@ Sub Primer_Blast()
     Do While ie.document.getElementsByName("PRIMER_PAIRS_NUMBER").Length = 0
         DoEvents
     Loop
-    
+        
     ' Retrieve the value of the element as a string
     pairs_number_str = ie.document.getElementsByName("PRIMER_PAIRS_NUMBER")(0).Value
     
@@ -153,34 +207,21 @@ Sub Primer_Blast()
     pairs_number = CInt(pairs_number_str)
 
     ' Output the value in a message box for debugging purposes
-    ActiveSheet.Cells(2, 7).Value = pairs_number ' Write pairs_number value to column G2
+'    ActiveSheet.Cells(2, 8).Value = pairs_number ' Write pairs_number value to column H2
 '    MsgBox "Pairs Number: " & pairs_number
 
     Dim i As Integer
     Dim j As Integer
-'    Dim table As Object
-'    Dim row As Object
-'    Dim cell As Object
-
-'    ' Find the table element
-'    Set table = ie.document.getElementsByTagName("table")(0) ' Adjust the index if there are multiple tables
-'
-'    ' Loop through the table rows and cells
-'    i = 20 'Row
-'    For Each row In table.Rows
-'        j = 1 'Column
-'        For Each cell In row.Cells
-'            ActiveSheet.Cells(i, j).Value = cell.innerText
-'            j = j + 1
-'        Next cell
-'        i = i + 1
-'    Next row
-
     Dim fw_primer As String
     Dim fw_tm As String
     Dim rv_primer As String
     Dim rv_tm As String
     Dim product_length As String
+    
+    Dim prPairInfo As Object
+    Dim prPairDt1 As Object
+    Dim prPairT1 As Object
+    Dim prPairDt1Count As Integer
     
     ' Loop through each pair and retrieve the values
     For i = 0 To pairs_number - 1
@@ -197,18 +238,79 @@ Sub Primer_Blast()
         product_length = ie.document.getElementsByName("PRODUCT_LENGTH_" & i)(0).Value
         
         ' Write the values to the active sheet, starting from row 2
-        ActiveSheet.Cells(i + 9, 1).Value = fw_primer ' Write FW_PRIMER_SEQ_ value to column A9
-        ActiveSheet.Cells(i + 9, 2).Value = fw_tm ' Write FW_PRIMER_TM_ value to column B9
-        ActiveSheet.Cells(i + 9, 3).Value = rv_primer ' Write RV_PRIMER_SEQ_ value to column C9
-        ActiveSheet.Cells(i + 9, 4).Value = rv_tm ' Write RV_PRIMER_TM_ value to column D9
-        ActiveSheet.Cells(i + 9, 5).Value = product_length ' Write PRODUCT_LENGTH_ value to column D9
-    Next i
+        With ActiveSheet
+'            .Cells(i + 9, 1).ClearFormats
+            .Cells(i + 9, 1).Value = fw_primer ' Write FW_PRIMER_SEQ_ value to column A9
+'            .Cells(i + 9, 2).ClearFormats
+            .Cells(i + 9, 2).Value = fw_tm ' Write FW_PRIMER_TM_ value to column B9
+'            .Cells(i + 9, 3).ClearFormats
+            .Cells(i + 9, 3).Value = rv_primer ' Write RV_PRIMER_SEQ_ value to column C9
+'            .Cells(i + 9, 4).ClearFormats
+            .Cells(i + 9, 4).Value = rv_tm ' Write RV_PRIMER_TM_ value to column D9
+'            .Cells(i + 9, 5).ClearFormats
+            .Cells(i + 9, 5).Value = product_length ' Write PRODUCT_LENGTH_ value to column E9
+        End With
+        
+        ' Debugging output to check if the loop continues
+        Debug.Print "Finished writing values for pair " & i
+        
+        ' Ensure the prPairInfo elements are loaded before interacting
+        Do While ie.document.getElementsByClassName("prPairInfo").Length = 0
+            DoEvents
+        Loop
+    
+        ' Get the prPairInfo element
+        Set prPairInfo = ie.document.getElementsByClassName("prPairInfo")(i)
+        
+        ' Debugging output to check if prPairInfo is found
+        If Not prPairInfo Is Nothing Then
+            Debug.Print "prPairInfo " & i & " found"
+            
+        ' Ensure the prPairT1 elements are loaded before interacting
+        Do While prPairInfo.getElementsByClassName("prPairTl").Length = 0
+            DoEvents
+        Loop
 
-    ' Exit the subroutine if no errors occur
-    Exit Sub
+        ' Debugging output to check if prPairT1 elements are found
+        Debug.Print "Number of prPairT1 elements: " & prPairInfo.getElementsByClassName("prPairTl").Length
+
+        ' Loop through each prPairT1 element to find the correct hidden shown class
+        For Each prPairT1 In prPairInfo.getElementsByClassName("prPairTl")
+            Debug.Print "prPairT1 found with innerText: " & prPairT1.innerText
+            If prPairT1.innerText = "Products on potentially unintended templates" Then
+                ' Get all prPairDt1 elements within the same parent node
+                Set prPairDt1 = prPairT1.ParentNode.getElementsByClassName("prPairDtl")(0)
+                
+                ' Check if prPairDt1 elements are found
+                If Not prPairDt1 Is Nothing Then
+                    ' Count the number of <pre> elements inside prPairDt1
+                    prPairDt1Count = prPairDt1.getElementsByTagName("pre").Length
+                    
+                    ' Write the count of <pre> elements to the active sheet
+                    ActiveSheet.Cells(i + 9, 6).Value = prPairDt1Count ' Write to column F
+
+                    ' Debugging output
+                    Debug.Print "prPairInfo " & i & ": " & prPairDt1Count & " <pre> elements found"
+                Else
+                    ' Debugging output if prPairDt1 elements are not found
+                    Debug.Print "No prPairDt1 elements found in prPairInfo " & i
+                End If
+                Exit For
+            End If
+        Next prPairT1
+    Else
+        ' Debugging output if prPairInfo is not found
+        Debug.Print "prPairInfo " & i & " not found"
+    End If
+Next i
+
+' Exit the subroutine if no errors occur
+Exit Sub
 
 ErrorHandler:
-    MsgBox "An error occurred: " & Err.Description
+    MsgBox "An error occurred: " & Err.Description & vbCrLf & _
+           "Error Number: " & Err.Number & vbCrLf & _
+           "Line: " & Erl
     If Not ie Is Nothing Then
         ie.Quit
         Set ie = Nothing

@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module4"
+Attribute VB_Name = "SNP_Check"
 Sub SNP_Check()
     On Error GoTo ErrorHandler
    
@@ -127,27 +127,39 @@ Sub SNP_Check()
             newIE.ExecWB 17, 0 ' Select All
             newIE.ExecWB 12, 2 ' Copy
 
-            Set cell = ActiveSheet.Cells(row, 6)
-
-'            ' Store the current border properties
-'            For Each border In Array(xlEdgeLeft, xlEdgeTop, xlEdgeBottom, xlEdgeRight, xlInsideVertical, xlInsideHorizontal)
-'                cell.Borders(border).LineStyle = cell.Borders(border).LineStyle
-'                cell.Borders(border).Weight = cell.Borders(border).Weight
-'                cell.Borders(border).Color = cell.Borders(border).Color
-'            Next border
+            Set cell = ActiveSheet.Cells(row, 11)
 
             ' Insert the image into the Excel sheet using Shapes.AddPicture
-            ActiveSheet.Shapes.AddPicture imgURL, _
+            Dim originalWidth As Single
+            Dim originalHeight As Single
+            Dim newWidth As Single
+            Dim newHeight As Single
+            Dim maxHeight As Single
+            Dim centerLeft As Single
+            Dim centerTop As Single
+
+            ' Set the maximum height
+            maxHeight = 14
+
+            ' Get the original dimensions of the image
+            originalWidth = newIE.document.images(0).Width
+            originalHeight = newIE.document.images(0).Height
+
+            ' Calculate the new dimensions while maintaining the aspect ratio based on height
+            newHeight = maxHeight
+            newWidth = (originalWidth / originalHeight) * maxHeight
+
+            ' Calculate the center position for the image
+            centerLeft = cell.Left + (cell.Width - newWidth) / 2
+            centerTop = cell.Top + (cell.Height - newHeight) / 2
+
+            ' Insert the image with the new dimensions
+            With ActiveSheet.Shapes.AddPicture(imgURL, _
                 msoFalse, msoCTrue, _
-                cell.Left, cell.Top, 15, 15   ' Adjust the width and height as needed
-
-'            ' Reapply the stored border properties
-'            For Each border In Array(xlEdgeLeft, xlEdgeTop, xlEdgeBottom, xlEdgeRight, xlInsideVertical, xlInsideHorizontal)
-'                cell.Borders(border).LineStyle = cell.Borders(border).LineStyle
-'                cell.Borders(border).Weight = cell.Borders(border).Weight
-'                cell.Borders(border).Color = cell.Borders(border).Color
-'            Next border
-
+                centerLeft, centerTop, newWidth, newHeight)
+                .LockAspectRatio = msoTrue ' Lock the aspect ratio
+            End With
+            
             ' Close the browser
             newIE.Quit
             Set newIE = Nothing
@@ -175,47 +187,39 @@ Sub SNP_Check()
             newIE.ExecWB 17, 0 ' Select All
             newIE.ExecWB 12, 2 ' Copy
             
-            Set cell = ActiveSheet.Cells(row, 10)
-
-'            ' Store the current border properties
-'            For Each border In Array(xlEdgeLeft, xlEdgeTop, xlEdgeBottom, xlEdgeRight, xlInsideVertical, xlInsideHorizontal)
-'                cell.Borders(border).LineStyle = cell.Borders(border).LineStyle
-'                cell.Borders(border).Weight = cell.Borders(border).Weight
-'                cell.Borders(border).Color = cell.Borders(border).Color
-'            Next border
+            Set cell = ActiveSheet.Cells(row, 12)
 
             ' Insert the image into the Excel sheet using Shapes.AddPicture
-            Dim originalWidth As Single
-            Dim originalHeight As Single
-            Dim newWidth As Single
-            Dim newHeight As Single
-            Dim maxHeight As Single
+            Dim originalWidth2 As Single
+            Dim originalHeight2 As Single
+            Dim newWidth2 As Single
+            Dim newHeight2 As Single
+            Dim maxHeight2 As Single
+            Dim centerLeft2 As Single
+            Dim centerTop2 As Single
 
             ' Set the maximum height
-            maxHeight = 15
+            maxHeight2 = 14
 
             ' Get the original dimensions of the image
-            originalWidth = newIE.document.images(0).Width
-            originalHeight = newIE.document.images(0).Height
+            originalWidth2 = newIE.document.images(0).Width
+            originalHeight2 = newIE.document.images(0).Height
 
             ' Calculate the new dimensions while maintaining the aspect ratio based on height
-            newHeight = maxHeight
-            newWidth = (originalWidth / originalHeight) * maxHeight
+            newHeight2 = maxHeight2
+            newWidth2 = (originalWidth2 / originalHeight2) * maxHeight2
+
+            ' Calculate the center position for the image
+            centerLeft2 = cell.Left + (cell.Width - newWidth2) / 2
+            centerTop2 = cell.Top + (cell.Height - newHeight2) / 2
 
             ' Insert the image with the new dimensions
             With ActiveSheet.Shapes.AddPicture(imgURL_primer, _
                 msoFalse, msoCTrue, _
-                cell.Left, cell.Top, newWidth, newHeight)
+                centerLeft2, centerTop2, newWidth2, newHeight2)
                 .LockAspectRatio = msoTrue ' Lock the aspect ratio
             End With
-            
-'            ' Reapply the stored border properties
-'            For Each border In Array(xlEdgeLeft, xlEdgeTop, xlEdgeBottom, xlEdgeRight, xlInsideVertical, xlInsideHorizontal)
-'                cell.Borders(border).LineStyle = cell.Borders(border).LineStyle
-'                cell.Borders(border).Weight = cell.Borders(border).Weight
-'                cell.Borders(border).Color = cell.Borders(border).Color
-'            Next border
-            
+           
             ' Close the browser
             newIE.Quit
             Set newIE = Nothing

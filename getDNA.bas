@@ -1,4 +1,4 @@
-Attribute VB_Name = "Module2"
+Attribute VB_Name = "getDNA"
 Sub getDNA_Coordinates()
     On Error GoTo ErrorHandler
     Dim ie As Object
@@ -8,13 +8,16 @@ Sub getDNA_Coordinates()
     Dim Ch As String
     Dim St As String
     Dim En As String
+    Dim genome As String
+    
     Ch = ActiveSheet.Range("B2").Value
     St = ActiveSheet.Range("C2").Value
     En = ActiveSheet.Range("D2").Value
+    genome = ActiveSheet.Range("G2").Value
     
     ' Construct the URL with the position parameter
     Dim url As String
-    url = "https://genome.ucsc.edu/cgi-bin/hgc?g=getDna&i=mixed&c=chr" & Ch & "&l=" & St & "&r=" & En & "&db=hg19"
+    url = "https://genome.ucsc.edu/cgi-bin/hgc?g=getDna&i=mixed&c=chr" & Ch & "&l=" & St & "&r=" & En & "&db=" & genome
     
     ' Open the browser and navigate to the desired URL
     ie.Visible = True
@@ -47,6 +50,9 @@ Sub getDNA_Coordinates()
     ' Paste the content into Excel
     ActiveSheet.Range("A2").Value = content
     
+    ' Create a link to UCSC
+    ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Cells(2, 9), Address:="https://genome-euro.ucsc.edu/cgi-bin/hgTracks?db=" & genome & "&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr" & Ch & "%3A" & St & "-" & En, TextToDisplay:="UCSC"
+    
     ' Uncomment to close the browser if needed
     ie.Quit
     Set ie = Nothing
@@ -67,11 +73,14 @@ Sub getDNA_Gene()
     
     ' Get the value from cell
     Dim Ge As String
+    Dim genome As String
+    
     Ge = ActiveSheet.Range("E2").Value
+    genome = ActiveSheet.Range("G2").Value
     
     ' Construct the URL with the position parameter
     Dim url As String
-    url = "https://genome.ucsc.edu/cgi-bin/hgGene?db=hg19&hgg_gene=" & Ge
+    url = "https://genome.ucsc.edu/cgi-bin/hgGene?db=" & genome & "&hgg_gene=" & Ge
     
     ' Open the browser and navigate to the desired URL
     ie.Visible = True
@@ -89,8 +98,25 @@ Sub getDNA_Gene()
     
     ' Loop through all links and click the one containing "Genomic Sequence"
     Dim link As Object
+    Dim sequence As String
+    Dim Ch As String
+    Dim St As String
+    Dim En As String
     For Each link In ie.document.getElementsByTagName("a")
         If InStr(link.innerText, "Genomic Sequence") > 0 Then
+            ' Extract the sequence between parentheses
+            sequence = Mid(link.innerText, InStr(link.innerText, "(") + 1, InStr(link.innerText, ")") - InStr(link.innerText, "(") - 1)
+            
+            ' Extract the chromosome number (Ch)
+            Ch = Mid(sequence, InStr(sequence, "chr") + 3, InStr(sequence, ":") - InStr(sequence, "chr") - 3)
+            
+            ' Extract the start position (St)
+            St = Mid(sequence, InStr(sequence, ":") + 1, InStr(sequence, "-") - InStr(sequence, ":") - 1)
+            
+            ' Extract the end position (En)
+            En = Mid(sequence, InStr(sequence, "-") + 1, Len(sequence) - InStr(sequence, "-"))
+            
+            ' Click the link
             link.Click
             Exit For
         End If
@@ -117,7 +143,13 @@ Sub getDNA_Gene()
     
     ' Paste the content into Excel
     ActiveSheet.Range("A2").Value = content
-    
+    ActiveSheet.Range("B2").Value = Ch
+    ActiveSheet.Range("C2").Value = St
+    ActiveSheet.Range("D2").Value = En
+        
+    ' Create a link to UCSC
+    ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Cells(2, 9), Address:="https://genome-euro.ucsc.edu/cgi-bin/hgTracks?db=" & genome & "&lastVirtModeType=default&lastVirtModeExtraState=&virtModeType=default&virtMode=0&nonVirtPosition=&position=chr" & Ch & "%3A" & St & "-" & En, TextToDisplay:="UCSC"
+        
     ' Uncomment to close the browser if needed
     ie.Quit
     Set ie = Nothing
