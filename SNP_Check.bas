@@ -7,9 +7,9 @@ Sub SNP_Check()
     ' Get the value from cell
     Dim Fw As String
     Dim Re As String
-    Fw = ThisWorkbook.Sheets(1).Range("F2").Value
-    Re = ThisWorkbook.Sheets(1).Range("G2").Value
-    Ch = ThisWorkbook.Sheets(1).Range("B2").Value
+    Fw = ActiveSheet.Range("F2").Value
+    Re = ActiveSheet.Range("G2").Value
+    Ch = ActiveSheet.Range("B2").Value
     
     ' Open the browser and navigate to the desired URL
     ie.Visible = True

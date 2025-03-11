@@ -8,9 +8,9 @@ Sub getDNA_Coordinates()
     Dim Ch As String
     Dim St As String
     Dim En As String
-    Ch = ThisWorkbook.Sheets(1).Range("B2").Value
-    St = ThisWorkbook.Sheets(1).Range("C2").Value
-    En = ThisWorkbook.Sheets(1).Range("D2").Value
+    Ch = ActiveSheet.Range("B2").Value
+    St = ActiveSheet.Range("C2").Value
+    En = ActiveSheet.Range("D2").Value
     
     ' Construct the URL with the position parameter
     Dim url As String
@@ -45,7 +45,7 @@ Sub getDNA_Coordinates()
     content = ie.document.getElementsByTagName("pre")(0).innerText ' Assuming the content is in the first <pre> tag
     
     ' Paste the content into Excel
-    ThisWorkbook.Sheets(1).Range("A2").Value = content
+    ActiveSheet.Range("A2").Value = content
     
     ' Uncomment to close the browser if needed
     ie.Quit
@@ -67,7 +67,7 @@ Sub getDNA_Gene()
     
     ' Get the value from cell
     Dim Ge As String
-    Ge = ThisWorkbook.Sheets(1).Range("E2").Value
+    Ge = ActiveSheet.Range("E2").Value
     
     ' Construct the URL with the position parameter
     Dim url As String
@@ -116,7 +116,7 @@ Sub getDNA_Gene()
     content = ie.document.getElementsByTagName("pre")(0).innerText ' Assuming the content is in the first <pre> tag
     
     ' Paste the content into Excel
-    ThisWorkbook.Sheets(1).Range("A2").Value = content
+    ActiveSheet.Range("A2").Value = content
     
     ' Uncomment to close the browser if needed
     ie.Quit
