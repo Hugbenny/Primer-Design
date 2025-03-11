@@ -57,6 +57,14 @@ Sub Primer_Blast()
         DoEvents
     Loop
         
+    Debug.Print "Busy: " & ie.Busy & ", ReadyState: " & ie.readyState
+        
+    'Craziest workaround ever due to bugged IE Eventhandling
+'    Do While ie.readyState = 4: DoEvents: Loop
+    Do Until ie.readyState = 4: DoEvents: Loop
+        
+    Debug.Print "Busy: " & ie.Busy & ", ReadyState: " & ie.readyState
+        
     ' Ensure elements are loaded before interacting
     Do While ie.document.getElementById("seq") Is Nothing
         DoEvents
@@ -133,26 +141,53 @@ Sub Primer_Blast()
         .Click
     End With
     
-    ' Wait for the new tab to fully load
-    Do While ie.Busy Or ie.readyState <> 4
-        DoEvents
-    Loop
-
     ' Wait for the page to fully load
     Do While ie.Busy Or ie.readyState <> 4
         DoEvents
     Loop
-    
-    ' Wait for the new tab to fully load
-    Do While ie.Busy Or ie.readyState <> 4
-        DoEvents
-    Loop
-
+           
+    Debug.Print "Busy: " & ie.Busy & ", ReadyState: " & ie.readyState
+           
+    'Craziest workaround ever due to bugged IE Eventhandling
+'    Do While ie.readyState = 4: DoEvents: Loop
+    Do Until ie.readyState = 4: DoEvents: Loop
+           
+    ' Check for "Submitted"
+    If InStr(ie.document.body.innerText, "Submitted") > 0 Then
+        While InStr(ie.document.body.innerText, "Submitted") > 0
+            ' Wait for the next page to load
+            Do While ie.Busy Or ie.readyState <> 4
+                DoEvents
+            Loop
+        Wend
+        'Craziest workaround ever due to bugged IE Eventhandling
+'        Do While ie.readyState = 4: DoEvents: Loop
+        Do Until ie.readyState = 4: DoEvents: Loop
+        ' Check for "Running"
+        If InStr(ie.document.body.innerText, "Running") > 0 Then
+            While InStr(ie.document.body.innerText, "Running") > 0
+                ' Wait for the next page to load
+                Do While ie.Busy Or ie.readyState <> 4
+                    DoEvents
+                Loop
+            Wend
+            'Craziest workaround ever due to bugged IE Eventhandling
+'            Do While ie.readyState = 4: DoEvents: Loop
+            Do Until ie.readyState = 4: DoEvents: Loop
+        End If
+    End If
+        
     ' Wait for the page to fully load
     Do While ie.Busy Or ie.readyState <> 4
         DoEvents
     Loop
-
+        
+    Debug.Print "Busy: " & ie.Busy & ", ReadyState: " & ie.readyState
+        
+    'Craziest workaround ever due to bugged IE Eventhandling
+'    Do While ie.readyState = 4: DoEvents: Loop
+    Do Until ie.readyState = 4: DoEvents: Loop
+        
     ' Wait for the checkbox with id "seq_1" to appear
     Do While ie.document.getElementById("seq_1") Is Nothing
         DoEvents
@@ -171,35 +206,65 @@ Sub Primer_Blast()
     Loop
     
     submitButton.Click
-
-    ' Wait for the new tab to fully load
-    Do While ie.Busy Or ie.readyState <> 4
-        DoEvents
-    Loop
-        
-    ' Wait for the new tab to fully load
-    Do While ie.Busy Or ie.readyState <> 4
-        DoEvents
-    Loop
-        
-    ' Wait for the new tab to fully load
-    Do While ie.Busy Or ie.readyState <> 4
-        DoEvents
-    Loop
-
+    
+    ' Debugging if seq_1 is checked
+    Debug.Print "Sequence selected"
+    
     ' Wait for the page to fully load
     Do While ie.Busy Or ie.readyState <> 4
         DoEvents
     Loop
+    
+    Debug.Print "Busy: " & ie.Busy & ", ReadyState: " & ie.readyState
+    
+    'Craziest workaround ever due to bugged IE Eventhandling
+'    Do While ie.readyState = 4: DoEvents: Loop
+    Do Until ie.readyState = 4: DoEvents: Loop
+           
+    ' Check for "Submitted"
+    If InStr(ie.document.body.innerText, "Submitted") > 0 Then
+        While InStr(ie.document.body.innerText, "Submitted") > 0
+            ' Wait for the next page to load
+            Do While ie.Busy Or ie.readyState <> 4
+                DoEvents
+            Loop
+        Wend
+        'Craziest workaround ever due to bugged IE Eventhandling
+'        Do While ie.readyState = 4: DoEvents: Loop
+        Do Until ie.readyState = 4: DoEvents: Loop
+        ' Check for "Running"
+        If InStr(ie.document.body.innerText, "Running") > 0 Then
+            While InStr(ie.document.body.innerText, "Running") > 0
+                ' Wait for the next page to load
+                Do While ie.Busy Or ie.readyState <> 4
+                    DoEvents
+                Loop
+            Wend
+            'Craziest workaround ever due to bugged IE Eventhandling
+'            Do While ie.readyState = 4: DoEvents: Loop
+            Do Until ie.readyState = 4: DoEvents: Loop
+        End If
+    End If
         
+    ' Wait for the page to fully load
+    Do While ie.Busy Or ie.readyState <> 4
+        DoEvents
+    Loop
+    
+    Debug.Print "Busy: " & ie.Busy & ", ReadyState: " & ie.readyState
+    
+    'Craziest workaround ever due to bugged IE Eventhandling
+'    Do While ie.readyState = 4: DoEvents: Loop
+    Do Until ie.readyState = 4: DoEvents: Loop
+    
     Dim pairs_number As Integer
     Dim pairs_number_str As String
-    
+                       
     ' Ensure the element is loaded before interacting
     Do While ie.document.getElementsByName("PRIMER_PAIRS_NUMBER").Length = 0
         DoEvents
     Loop
-        
+    
     ' Retrieve the value of the element as a string
     pairs_number_str = ie.document.getElementsByName("PRIMER_PAIRS_NUMBER")(0).Value
     
@@ -207,7 +272,10 @@ Sub Primer_Blast()
     pairs_number = CInt(pairs_number_str)
 
     ' Output the value in a message box for debugging purposes
-'    ActiveSheet.Cells(2, 8).Value = pairs_number ' Write pairs_number value to column H2
+    ActiveSheet.Cells(2, 8).Value = pairs_number ' Write pairs_number value to column H2
+    
+    ' Debugging if subroutine is finished
+    Debug.Print "Pairs Number: " & pairs_number
 '    MsgBox "Pairs Number: " & pairs_number
 
     Dim i As Integer
@@ -303,6 +371,9 @@ Sub Primer_Blast()
         Debug.Print "prPairInfo " & i & " not found"
     End If
 Next i
+
+' Debugging if subroutine is finished
+Debug.Print "Subroutine finished"
 
 ' Exit the subroutine if no errors occur
 Exit Sub

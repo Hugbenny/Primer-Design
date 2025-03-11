@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## [2.0.0] - 03/03/2025
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Permission Denied Error 70 with this method : https://stackoverflow.com/questions/10283496/vba-internet-explorer-automation-permission-denied
+
+### Removed
+
+### Issues
+
+- If another Excel file is open, data writing may occur in that file
+
+### To Do
+
+- Implement a restriction at the script launch to write only on the sheet from which the script was launched.
+
 ## [1.3.0] - 03/03/2025
 
 ### Added
@@ -85,6 +105,7 @@
 
 # VERSIONS
 
+[2.0.0]: https://github.com/Hugbenny/Primer_Design/releases/tag/v2.0.0
 [1.3.0]: https://github.com/Hugbenny/Primer_Design/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Hugbenny/Primer_Design/releases/tag/v1.2.0
 [1.1.0]: https://github.com/Hugbenny/Primer_Design/releases/tag/v1.1.0
