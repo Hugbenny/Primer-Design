@@ -20,15 +20,16 @@ Sub Primer_Blast()
     Dim max_gc As String
     Dim self As String
     Dim max_comp As String
-    
+    Dim max_target As String
+        
     sequence = ActiveSheet.Range("A2").Value
     
     ' Set the active sheet and the Variables sheet
     Set wsActive = ActiveSheet
     Set wsVariables = ThisWorkbook.Sheets("Variables")
     
-    ' Get the value in cell H2 of the active sheet
-    searchValue = wsActive.Range("H2").Value
+    ' Get the value in cell F2 of the active sheet
+    searchValue = wsActive.Range("F2").Value
     
     ' Find the cell in the Variables sheet that matches the search value
     Set foundCell = wsVariables.Range("A:A").Find(What:=searchValue, LookIn:=xlValues, LookAt:=xlWhole)
@@ -44,17 +45,7 @@ Sub Primer_Blast()
         If Not IsEmpty(foundCell.Offset(0, 7).Value) Then max_gc = foundCell.Offset(0, 7).Value Else max_gc = "None"
         If Not IsEmpty(foundCell.Offset(0, 8).Value) Then self = foundCell.Offset(0, 8).Value Else self = "None"
         If Not IsEmpty(foundCell.Offset(0, 9).Value) Then max_comp = foundCell.Offset(0, 9).Value Else max_comp = "None"
-    Else
-        ' Handle the case where the value is not found
-        min_prod = "None"
-        max_prod = "None"
-        min_tm = "None"
-        max_tm = "None"
-        max_diff_tm = "None"
-        database = "None"
-        max_gc = "None"
-        self = "None"
-        max_comp = "None"
+        If Not IsEmpty(foundCell.Offset(0, 10).Value) Then max_target = foundCell.Offset(0, 10).Value Else max_target = "None"
     End If
     
     ' Open the browser and navigate to the desired URL
@@ -96,20 +87,24 @@ Sub Primer_Blast()
             .getElementById("PRIMER_MAX_DIFF_TM").FireEvent "onchange"
         End If
         If database <> "None" Then
-            .getElementById("PRIMER_DATABASE").Value = database
-            .getElementById("PRIMER_DATABASE").FireEvent "onchange"
+            .getElementById("PRIMER_SPECIFICITY_DATABASE").Value = database
+            .getElementById("PRIMER_SPECIFICITY_DATABASE").FireEvent "onchange"
         End If
         If max_gc <> "None" Then
             .getElementById("PRIMER_MAX_GC").Value = max_gc
             .getElementById("PRIMER_MAX_GC").FireEvent "onchange"
         End If
         If self <> "None" Then
-            .getElementById("PRIMER_SELF").Value = self
-            .getElementById("PRIMER_SELF").FireEvent "onchange"
+            .getElementById("SELF_ANY").Value = self
+            .getElementById("SELF_ANY").FireEvent "onchange"
         End If
         If max_comp <> "None" Then
-            .getElementById("PRIMER_MAX_COMP").Value = max_comp
-            .getElementById("PRIMER_MAX_COMP").FireEvent "onchange"
+            .getElementById("PRIMER_PAIR_MAX_COMPL_ANY").Value = max_comp
+            .getElementById("PRIMER_PAIR_MAX_COMPL_ANY").FireEvent "onchange"
+        End If
+        If max_target <> "None" Then
+            .getElementById("NUM_TARGETS").Value = max_target
+            .getElementById("NUM_TARGETS").FireEvent "onchange"
         End If
         .getElementById("NO_SNP").Checked = True
         .getElementById("NO_SNP").FireEvent "onclick"
@@ -138,68 +133,78 @@ Sub Primer_Blast()
         .Click
     End With
     
-' Wait for the new tab to fully load
-Do While ie.Busy Or ie.readyState <> 4
-    DoEvents
-Loop
-
-' Loop to check each new tab loaded
-Dim tabLoaded As Boolean
-tabLoaded = True
-
-Do While tabLoaded
-    ' Wait for the page to fully load
+    ' Wait for the new tab to fully load
     Do While ie.Busy Or ie.readyState <> 4
         DoEvents
     Loop
+
+    Dim pairs_number As Integer
+    Dim pairs_number_str As String
     
-    ' Check if the elements exist
-    On Error Resume Next ' Ignore errors if elements do not exist
-    If Not ie.document.getElementById("seq_1") Is Nothing And Not ie.document.getElementById("nw1") Is Nothing Then
-        ' Check the boxes with id "seq_1" and "nw1"
-        With ie.document
-            .getElementById("seq_1").Checked = True
-            .getElementById("seq_1").FireEvent "onclick"
-            
-            .getElementById("nw1").Checked = False
-            .getElementById("nw1").FireEvent "onclick"
-        End With
+    ' Ensure the element is loaded before interacting
+    Do While ie.document.getElementsByName("PRIMER_PAIRS_NUMBER").Length = 0
+        DoEvents
+    Loop
+    
+    ' Retrieve the value of the element as a string
+    pairs_number_str = ie.document.getElementsByName("PRIMER_PAIRS_NUMBER")(0).Value
+    
+    ' Convert the string to an integer
+    pairs_number = CInt(pairs_number_str)
+
+    ' Output the value in a message box for debugging purposes
+    ActiveSheet.Cells(2, 7).Value = pairs_number ' Write pairs_number value to column G2
+'    MsgBox "Pairs Number: " & pairs_number
+
+    Dim i As Integer
+    Dim j As Integer
+'    Dim table As Object
+'    Dim row As Object
+'    Dim cell As Object
+
+'    ' Find the table element
+'    Set table = ie.document.getElementsByTagName("table")(0) ' Adjust the index if there are multiple tables
+'
+'    ' Loop through the table rows and cells
+'    i = 20 'Row
+'    For Each row In table.Rows
+'        j = 1 'Column
+'        For Each cell In row.Cells
+'            ActiveSheet.Cells(i, j).Value = cell.innerText
+'            j = j + 1
+'        Next cell
+'        i = i + 1
+'    Next row
+
+    Dim fw_primer As String
+    Dim fw_tm As String
+    Dim rv_primer As String
+    Dim rv_tm As String
+    Dim product_length As String
+    
+    ' Loop through each pair and retrieve the values
+    For i = 0 To pairs_number - 1
+        ' Ensure the elements are loaded before interacting
+        Do While ie.document.getElementsByName("FW_PRIMER_SEQ_" & i).Length = 0 Or ie.document.getElementsByName("RV_PRIMER_SEQ_" & i).Length = 0
+            DoEvents
+        Loop
+
+        ' Retrieve the values
+        fw_primer = ie.document.getElementsByName("FW_PRIMER_SEQ_" & i)(0).Value
+        fw_tm = ie.document.getElementsByName("FW_PRIMER_TM_" & i)(0).Value
+        rv_primer = ie.document.getElementsByName("RV_PRIMER_SEQ_" & i)(0).Value
+        rv_tm = ie.document.getElementsByName("RV_PRIMER_TM_" & i)(0).Value
+        product_length = ie.document.getElementsByName("PRODUCT_LENGTH_" & i)(0).Value
         
-        ' Press the button with value "Submit"
-        With ie.document
-            Dim submitButton As Object
-            Set submitButton = .querySelector("input[value='Submit']")
-            If Not submitButton Is Nothing Then
-                submitButton.Click
-            End If
-        End With
-    End If
-    On Error GoTo 0 ' Resume normal error handling
-    
-    ' Wait for another tab to be loaded
-    ' (This part depends on how you determine if there are more tabs to load)
-    ' For example, you might have a list of URLs to navigate to:
-    ' If there are more URLs, navigate to the next one and set tabLoaded to True
-    ' If not, set tabLoaded to False
-    ' Example:
-    ' If moreUrlsExist Then
-    '     ie.Navigate nextUrl
-    '     Do While ie.Busy Or ie.readyState <> 4
-    '         DoEvents
-    '     Loop
-    '     tabLoaded = True
-    ' Else
-    '     tabLoaded = False
-    ' End If
-    
-    ' For this example, we'll just exit the loop
-    tabLoaded = False
-Loop
-    
-    ' Uncomment to close the browser if needed
-    ' ie.Quit
-    ' Set ie = Nothing
-    
+        ' Write the values to the active sheet, starting from row 2
+        ActiveSheet.Cells(i + 9, 1).Value = fw_primer ' Write FW_PRIMER_SEQ_ value to column A9
+        ActiveSheet.Cells(i + 9, 2).Value = fw_tm ' Write FW_PRIMER_TM_ value to column B9
+        ActiveSheet.Cells(i + 9, 3).Value = rv_primer ' Write RV_PRIMER_SEQ_ value to column C9
+        ActiveSheet.Cells(i + 9, 4).Value = rv_tm ' Write RV_PRIMER_TM_ value to column D9
+        ActiveSheet.Cells(i + 9, 5).Value = product_length ' Write PRODUCT_LENGTH_ value to column D9
+    Next i
+
+    ' Exit the subroutine if no errors occur
     Exit Sub
 
 ErrorHandler:
